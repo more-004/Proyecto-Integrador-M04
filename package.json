@@ -1,4 +1,14 @@
 {
+  "name": "proyecto-integrador-m04",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
   "dependencies": {
     "@aws-sdk/client-ses": "^3.1111.0",
     "firebase": "^12.17.1",
