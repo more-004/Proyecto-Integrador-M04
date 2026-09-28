@@ -1,19 +1,15 @@
-export const sendEmailSummary = async (toEmail: string, tasks: any[]) => {
-    const response = await fetch('/api/send-email', {
-        method: 'POST',
+import { Task } from "../types";
+
+export const sendTaskSummaryEmail = async (email: string, tasks: Task[]): Promise<void> => {
+    const response = await fetch("/api/send-email", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            email: toEmail,
-            tasks: tasks,
-        }),
+        body: JSON.stringify({ email, tasks }),
     });
 
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al enviar el correo');
+        throw new Error("Falló el envío del correo electrónico");
     }
-
-    return await response.json();
 };

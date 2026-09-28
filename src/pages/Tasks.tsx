@@ -8,7 +8,7 @@ import { TodoList } from "../components/TodoList";
 
 export const Tasks: React.FC = () => {
     const { user } = useAuth();
-    const { tasks, loading, error, addTask, toggleTask, removeTask } = useTasks(user?.uid);
+    const { tasks, loading, error, addTask, toggleTask, removeTask, updateTask } = useTasks(user?.uid);
     const [emailSending, setEmailSending] = useState(false);
     const [emailStatus, setEmailStatus] = useState<string | null>(null);
 
@@ -35,7 +35,6 @@ export const Tasks: React.FC = () => {
 
             <p>Bienvenido/a, <strong>{user?.email}</strong></p>
 
-            {/* Botón para activar la función de envío por email */}
             <button
                 onClick={handleSendEmail}
                 disabled={emailSending || tasks.length === 0}
@@ -53,7 +52,13 @@ export const Tasks: React.FC = () => {
             ) : error ? (
                 <p style={{ color: "red" }}>{error}</p>
             ) : (
-                <TodoList tasks={tasks} onToggleTask={toggleTask} onRemoveTask={removeTask} />
+
+                <TodoList
+                    tasks={tasks}
+                    onToggleTask={toggleTask}
+                    onRemoveTask={removeTask}
+                    onUpdateTask={updateTask}
+                />
             )}
         </div>
     );
