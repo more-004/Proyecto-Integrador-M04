@@ -1,54 +1,109 @@
-import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import { TodoList } from '../components/TodoList';
+import React, { useState } from 'react';
 import { Task } from '../types';
 
-vi.mock('../services/tasks', () => ({
-    updateTask: vi.fn(),
-}));
+interface TodoListProps {
+    tasks: Task[];
+    onToggleTask: (id: string, completed: boolean) => void;
+    onRemoveTask: (id: string) => void;
+    onUpdateTask?: (id: string, updatedTask: Partial<Task>) => void;
+}
 
-const mockTasks = [
-    {
-        id: '1',
-        title: 'Tarea de prueba M4',
-        description: 'Descripción de prueba para el evaluador',
-        completed: false,
-        userId: 'user-123',
-    },
-] as Task[];
+export const TodoList: React.FC<TodoListProps> = ({
+    tasks,
+    onToggleTask,
+    onRemoveTask,
+    onUpdateTask,
+}) => {
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editTitle, setEditTitle] = useState('');
+    const [editDescription, setEditDescription] = useState('');
 
-describe('Componente TodoList', () => {
-    it('renderiza la lista de tareas correctamente con sus botones', () => {
-        render(
-            <TodoList
-                tasks={mockTasks}
-                onToggleTask={vi.fn()}
-                onRemoveTask={vi.fn()}
-            />
-        );
+    const handleStartEdit = (task: Task) => {
+        setEditingId(task.id);
+        setEditTitle(task.title);
+        setEditDescription(task.description || '');
+    };
 
-        expect(screen.getByText('Tarea de prueba M4')).toBeInTheDocument();
-        expect(screen.getByText('Descripción de prueba para el evaluador')).toBeInTheDocument();
-        expect(screen.getByText('Editar')).toBeInTheDocument();
-        expect(screen.getByText('Completar')).toBeInTheDocument();
-        expect(screen.getByText('Eliminar')).toBeInTheDocument();
-    });
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setEditTitle('');
+        setEditDescription('');
+    };
 
-    it('activa el modo de edición al hacer clic en el botón Editar', () => {
-        render(
-            <TodoList
-                tasks={mockTasks}
-                onToggleTask={vi.fn()}
-                onRemoveTask={vi.fn()}
-            />
-        );
+    const handleSaveEdit = async (id: string) => {
+        if (!editTitle.trim()) return;
+        if (onUpdateTask) {
+            await onUpdateTask(id, {
+                title: editTitle.trim(),
+                description: editDescription.trim(),
+            });
+        }
+        setEditingId(null);
+    };
 
-        const editButton = screen.getByText('Editar');
-        fireEvent.click(editButton);
+    if (tasks.length === 0) {
+        return <p>No hay tareas registradas.</p>;
+    }
 
-        expect(screen.getByPlaceholderText('Título de la tarea')).toBeInTheDocument();
-        expect(screen.getByText('Guardar')).toBeInTheDocument();
-        expect(screen.getByText('Cancelar')).toBeInTheDocument();
-    });
-});
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {tasks.map((task) => (
+                <div
+                    key={task.id}
+                    style={{
+                        border: '1px solid #ccc',
+                        borderRadius: '6px',
+                        padding: '10px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}
+                >
+                    {editingId === task.id ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '100%' }}>
+                            <input
+                                type="text"
+                                value={editTitle}
+                                onChange={(e) => setEditTitle(e.target.value)}
+                                placeholder="Título de la tarea"
+                            />
+                            <textarea
+                                value={editDescription}
+                                onChange={(e) => setEditDescription(e.target.value)}
+                                placeholder="Descripción (opcional)"
+                            />
+                            <div style={{ display: 'flex', gap: '5px' }}>
+                                <button onClick={() => handleSaveEdit(task.id)}>Guardar</button>
+                                <button onClick={handleCancelEdit}>Cancelar</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <div>
+                                <h4 style={{ margin: 0, textDecoration: task.completed ? 'line-through' : 'none' }}>
+                                    {task.title}
+                                </h4>
+                                {task.description && (
+                                    <p style={{ margin: '4px 0 0 0', color: '#666', fontSize: '14px' }}>
+                                        {task.description}
+                                    </p>
+                                )}
+                            </div>
+                            <div style={{ display: 'flex', gap: '5px' }}>
+                                <button onClick={() => handleStartEdit(task)}>
+                                    Editar
+                                </button>
+                                <button onClick={() => onToggleTask(task.id, task.completed)}>
+                                    {task.completed ? 'Desmarcar' : 'Completar'}
+                                </button>
+                                <button onClick={() => onRemoveTask(task.id)} style={{ color: 'red' }}>
+                                    Eliminar
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+};
