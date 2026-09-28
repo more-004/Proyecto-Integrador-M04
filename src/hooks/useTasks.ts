@@ -1,56 +1,40 @@
-import { useState, useEffect, useCallback } from "react";
-import { Task } from "../types";
-import {
-    getTasksByUser,
-    createTask,
-    updateTask,
-    deleteTask
-} from "../services/tasks";
+import { useState, useEffect } from 'react';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { Task } from '../types';
 
 export const useTasks = (userId: string | undefined) => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-
-    const fetchTasks = useCallback(async () => {
-        if (!userId) return;
-        setLoading(true);
-        try {
-            const data = await getTasksByUser(userId);
-            setTasks(data);
-        } catch (err: any) {
-            setError("Error al cargar las tareas.");
-        } finally {
-            setLoading(false);
-        }
-    }, [userId]);
 
     useEffect(() => {
-        fetchTasks();
-    }, [fetchTasks]);
+        if (!userId) {
+            setTasks([]);
+            setLoading(false);
+            return;
+        }
 
-    const addTask = async (title: string, description: string) => {
-        if (!userId) return;
-        const newTask = {
-            userId,
-            title,
-            description,
-            completed: false,
-            createdAt: new Date().toISOString(),
-        };
-        await createTask(newTask);
-        await fetchTasks();
-    };
+        setLoading(true);
+        const q = query(collection(db, 'tasks'), where('userId', '==', userId));
 
-    const toggleTask = async (task: Task) => {
-        await updateTask(task.id, { completed: !task.completed });
-        await fetchTasks();
-    };
+        const unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+                const fetchedTasks = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                })) as Task[];
 
-    const removeTask = async (taskId: string) => {
-        await deleteTask(taskId);
-        await fetchTasks();
-    };
+                setTasks(fetchedTasks);
+                setLoading(false);
+            },
+            (error) => {
+                console.error('Error al escuchar tareas en tiempo real:', error);
+                setLoading(false);
+            }
+        );
+        return () => unsubscribe();
+    }, [userId]);
 
-    return { tasks, loading, error, addTask, toggleTask, removeTask, refreshTasks: fetchTasks };
+    return { tasks, loading };
 };
