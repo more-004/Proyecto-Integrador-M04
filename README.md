@@ -1,109 +1,89 @@
-# Gestión de Tareas (Task Manager)
+#Proyecto Integrador - Módulo 4: Aplicación de Gestión de Tareas
 
-Aplicación web para la gestión de tareas diarias desarrollada con React, TypeScript y Vite. Permite a los usuarios organizar sus pendientes y enviar un informe con el resumen de sus tareas directamente a su correo electrónico mediante la integración con **AWS SES (Simple Email Service)**.
+Aplicación web interactiva para la gestión de tareas personales en tiempo real con autenticación de usuarios, persistencia en la nube y alertas por correo electrónico.
 
----
+#Tecnologías Utilizadas
 
- Características
-
-* **Gestión de tareas:** Crear, marcar como completadas y eliminar tareas en tiempo real.
-* **Autenticación:** Gestión de sesiones de usuario.
-* **Notificaciones por email:** Envío de resúmenes de tareas directamente a la bandeja de entrada del usuario utilizando AWS SES SDK v3.
-
----
-
- Tecnologías Utilizadas
-
-* **Frontend:** React 19, TypeScript, Vite
-* **Servicios Cloud:** AWS SDK para JavaScript (`@aws-sdk/client-ses`)
-* **Autenticación y Almacenamiento:** Firebase
+- Frontend: React, TypeScript, Vite.
+- Base de Datos & Auth: Firebase Firestore (sincronización en tiempo real con `onSnapshot`) y Firebase Authentication.
+- Backend / Serverless: Vercel Serverless Functions (`/api/send-email`).
+- Notificaciones: AWS SES (Simple Email Service).
+- Testing: Vitest, React Testing Library, jsdom.
+- Despliegue: Vercel.
 
 ---
 
- Requisitos Previos
+#Seguridad e Integración con AWS SES
 
-1. **Node.js** (versión 18 o superior).
-2. Una cuenta activa en **Amazon Web Services (AWS)**.
-3. Un usuario en **AWS IAM** con la política `AmazonSESFullAccess` adjunta.
-4. Una identidad de correo electrónico verificada en **Amazon SES** (se requiere verificar tanto el correo remitente como los de prueba si la cuenta de AWS SES sigue en modo *Sandbox*).
+Para evitar la exposición de credenciales sensibles en el cliente (`VITE_AWS_ACCESS_KEY_ID`, `VITE_AWS_SECRET_ACCESS_KEY`), se migró la integración del SDK de AWS SES desde el frontend hacia una *Serverless Function de Vercel* en la ruta `api/send-email.ts`.
 
----
-
- Configuración del Entorno (`.env`)
-
-Crea un archivo `.env` en la raíz de tu proyecto basándote en la siguiente estructura e ingresa tus credenciales de AWS:
-
-```env
-# Configuración de AWS SES (Vite exige el prefijo VITE_)
-VITE_AWS_ACCESS_KEY_ID=tu_access_key_id
-VITE_AWS_SECRET_ACCESS_KEY=tu_secret_access_key
-VITE_AWS_REGION=us-east-2
-VITE_SENDER_EMAIL=tu_email_verificado@gmail.com
-
-Aqui tienes el texto completo en formato Markdown. Copia y pega todo el contenido directamente en tu archivo `README.md`:
-
-```markdown
-# Gestión de Tareas (Task Manager)
-
-Aplicación web para la gestión de tareas diarias desarrollada con React, TypeScript y Vite. Permite a los usuarios organizar sus pendientes y enviar un informe con el resumen de sus tareas directamente a su correo electrónico mediante la integración con **AWS SES (Simple Email Service)**.
+- Las claves de AWS están protegidas de manera totalmente segura como variables de entorno privadas en el panel de Vercel (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`).
+- El cliente React envía únicamente peticiones HTTP POST al endpoint seguro `/api/send-email`.
 
 ---
 
-## 🚀 Características
+#Sincronización en Tiempo Real y CRUD Completo
 
-* **Gestión de tareas:** Crear, marcar como completadas y eliminar tareas en tiempo real.
-* **Autenticación:** Gestión de sesiones de usuario.
-* **Notificaciones por email:** Envío de resúmenes de tareas directamente a la bandeja de entrada del usuario utilizando AWS SES SDK v3.
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-* **Frontend:** React 19, TypeScript, Vite
-* **Servicios Cloud:** AWS SDK para JavaScript (`@aws-sdk/client-ses`)
-* **Autenticación y Almacenamiento:** Firebase
+- Lectura en tiempo real: Se implementó `onSnapshot` en el custom hook `useTasks.ts` para reflejar instantáneamente cualquier cambio en la lista de tareas sin recargar la página.
+- CRUD Operativo: Los usuarios pueden crear, listar, marcar como completadas, eliminar y editar el título y la descripción de sus tareas registradas.
 
 ---
 
-## 📋 Requisitos Previos
+#Uso de Inteligencia Artificial Pruebas Unitarias y de Componentes
 
-1. **Node.js** (versión 18 o superior).
-2. Una cuenta activa en **Amazon Web Services (AWS)**.
-3. Un usuario en **AWS IAM** con la política `AmazonSESFullAccess` adjunta.
-4. Una identidad de correo electrónico verificada en **Amazon SES** (se requiere verificar tanto el correo remitente como los de prueba si la cuenta de AWS SES sigue en modo *Sandbox*).
+El proyecto cuenta con una suite de pruebas automáticas configurada con *Vitest* y *React Testing Library*.
 
----
+Para ejecutar las pruebas unitarias en tu entorno local:
 
-## ⚙️ Configuración del Entorno (`.env`)
-
-Crea un archivo `.env` en la raíz de tu proyecto basándote en la siguiente estructura e ingresa tus credenciales de AWS:
-
-```env
-# Configuración de AWS SES (Vite exige el prefijo VITE_)
-VITE_AWS_ACCESS_KEY_ID=tu_access_key_id
-VITE_AWS_SECRET_ACCESS_KEY=tu_secret_access_key
-VITE_AWS_REGION=us-east-2
-VITE_SENDER_EMAIL=tu_email_verificado@gmail.com
-
+```bash
+npx vitest run
 ```
 
-> **Nota de seguridad:** Nunca compartas ni subas tu archivo `.env` a repositorios públicos como GitHub. Verifica que esté incluido en el archivo `.gitignore`.
+---
+
+#Uso de Inteligencia Artificial (IA)
+
+En el desarrollo y refactorización de este proyecto se utilizó un asistente de Inteligencia Artificial como herramienta de soporte técnico, depuración y guía metodológica.
+
+#Ámbitos de uso:
+1. Refactorización de Seguridad: Diagnóstico de vulnerabilidades por exposición de claves en el cliente y diseño del patrón de arquitectura para delegar llamadas a la API de AWS SES hacia funciones Serverless de Vercel.
+2. Sincronización en Tiempo Real: Adaptación del flujo de datos en Firestore mediante `onSnapshot` para reemplazar consultas estáticas.
+3. Pruebas Automáticas: Estructuración e implementación de tests unitarios de componentes con Vitest y React Testing Library.
+
+---
+
+#Configuración e Instalación Local
+
+ Clonar el repositorio: Descarga una copia del código fuente desde GitHub a tu equipo local.
+   ```bash
+   git clone [https://github.com/more-004/Proyecto-Integrador-M04.git](https://github.com/more-004/Proyecto-Integrador-M04.git)
+   cd Proyecto-Integrador-M04
+```
 
 ---
 
 
-**Acceder a la aplicación:**
-Abre tu navegador e ingresa a `http://localhost:5173`.
+1. Instalar las dependencias: Descarga todas las librerías necesarias del proyecto (node_modules).
+
+```bash
+npm install
+```
+
+2. Configurar variables de entorno: Crea un archivo .env en la raíz con las credenciales públicas de Firebase para conectar la app local con la base de datos.
+
+VITE_FIREBASE_API_KEY=tu_api_key
+VITE_FIREBASE_AUTH_DOMAIN=tu_auth_domain
+VITE_FIREBASE_PROJECT_ID=tu_project_id
+VITE_FIREBASE_STORAGE_BUCKET=tu_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=tu_messaging_sender_id
+VITE_FIREBASE_APP_ID=tu_app_id
+
+3. Iniciar el servidor de desarrollo: Levanta la aplicación en el entorno local.
+
+```bash
+npm run dev
+```
 
 ---
 
- Uso de la Funcionalidad de Email
-
-1. Inicia sesión en la aplicación.
-2. Agrega las tareas que deseas gestionar.
-3. Haz clic en el botón **"Enviar resumen por email"**.
-4. Revisa tu bandeja de entrada (o la carpeta de *Spam / Correo no deseado* si es la primera vez que recibes un correo desde la cuenta de prueba de AWS).
-
-```
-
-```
+Despliegue en producción: https://proyecto-integrador-m04.vercel.app/
