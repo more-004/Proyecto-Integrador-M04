@@ -26,24 +26,24 @@ export const TodoForm: React.FC<TodoFormProps> = ({ onAddTask }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
             <h3>Agregar Nueva Tarea</h3>
-            <input
-                type="text"
-                placeholder="Título de la tarea..."
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                style={{ padding: "8px", fontSize: "16px" }}
-            />
-            <textarea
-                placeholder="Descripción (opcional)..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                style={{ padding: "8px", fontSize: "16px" }}
-            />
-            <button type="submit" disabled={loading} style={{ padding: "10px", cursor: "pointer" }}>
+            <div className="form-group">
+                <input
+                    type="text"
+                    placeholder="Título de la tarea..."
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                />
+                <textarea
+                    placeholder="Descripción (opcional)..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={3}
+                />
+            </div>
+            <button type="submit" className="btn-primary" disabled={loading}>
                 {loading ? "Guardando..." : "Guardar Tarea"}
             </button>
         </form>
