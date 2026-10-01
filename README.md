@@ -41,15 +41,12 @@ npx vitest run
 
 ---
 
-#Uso de Inteligencia Artificial (IA)
+#Uso de Inteligencia Artificial en el Desarrollo
 
-En el desarrollo y refactorización de este proyecto se utilizó un asistente de Inteligencia Artificial como herramienta de soporte técnico, depuración y guía metodológica.
+Durante el desarrollo de este proyecto se utilizó asistencia de Inteligencia Artificial para agilizar la integración de servicios en la nube, resolver configuraciones y acelerar el despliegue:
 
-#Ámbitos de uso:
-1. Refactorización de Seguridad: Diagnóstico de vulnerabilidades por exposición de claves en el cliente y diseño del patrón de arquitectura para delegar llamadas a la API de AWS SES hacia funciones Serverless de Vercel.
-2. Sincronización en Tiempo Real: Adaptación del flujo de datos en Firestore mediante `onSnapshot` para reemplazar consultas estáticas.
-3. Pruebas Automáticas: Estructuración e implementación de tests unitarios de componentes con Vitest y React Testing Library.
-
+* IA de Antigravity: Se utilizó para guiar la verificación de las identidades de correo electrónico (emisor y receptor) en Amazon Simple Email Service (AWS SES), garantizando la entrega correcta de los resúmenes por email.
+* Gemini: Se utilizó para la gestión y actualización de las variables de entorno de Firebase con sus valores correspondientes, así como para la generación, configuración y vinculación de las credenciales y variables de entorno de AWS dentro de Vercel.
 ---
 
 #Configuración e Instalación Local
