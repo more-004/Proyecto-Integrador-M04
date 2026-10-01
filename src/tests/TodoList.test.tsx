@@ -42,25 +42,15 @@ export const TodoList: React.FC<TodoListProps> = ({
     };
 
     if (tasks.length === 0) {
-        return <p>No hay tareas registradas.</p>;
+        return <p className="welcome-text">No hay tareas registradas.</p>;
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <ul className="task-list">
             {tasks.map((task) => (
-                <div
-                    key={task.id}
-                    style={{
-                        border: '1px solid #ccc',
-                        borderRadius: '6px',
-                        padding: '10px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                    }}
-                >
+                <li key={task.id} className="task-item">
                     {editingId === task.id ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '100%' }}>
+                        <div style={{ width: '100%' }}>
                             <input
                                 type="text"
                                 value={editTitle}
@@ -72,38 +62,38 @@ export const TodoList: React.FC<TodoListProps> = ({
                                 onChange={(e) => setEditDescription(e.target.value)}
                                 placeholder="Descripción (opcional)"
                             />
-                            <div style={{ display: 'flex', gap: '5px' }}>
-                                <button onClick={() => handleSaveEdit(task.id)}>Guardar</button>
-                                <button onClick={handleCancelEdit}>Cancelar</button>
+                            <div className="task-actions">
+                                <button className="btn-primary" onClick={() => handleSaveEdit(task.id)}>
+                                    Guardar
+                                </button>
+                                <button className="btn-secondary" onClick={handleCancelEdit}>
+                                    Cancelar
+                                </button>
                             </div>
                         </div>
                     ) : (
                         <>
-                            <div>
-                                <h4 style={{ margin: 0, textDecoration: task.completed ? 'line-through' : 'none' }}>
+                            <div className="task-info">
+                                <h3 style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
                                     {task.title}
-                                </h4>
-                                {task.description && (
-                                    <p style={{ margin: '4px 0 0 0', color: '#666', fontSize: '14px' }}>
-                                        {task.description}
-                                    </p>
-                                )}
+                                </h3>
+                                {task.description && <p>{task.description}</p>}
                             </div>
-                            <div style={{ display: 'flex', gap: '5px' }}>
-                                <button onClick={() => handleStartEdit(task)}>
+                            <div className="task-actions">
+                                <button className="btn-secondary" onClick={() => handleStartEdit(task)}>
                                     Editar
                                 </button>
-                                <button onClick={() => onToggleTask(task.id, task.completed)}>
+                                <button className="btn-secondary" onClick={() => onToggleTask(task.id, task.completed)}>
                                     {task.completed ? 'Desmarcar' : 'Completar'}
                                 </button>
-                                <button onClick={() => onRemoveTask(task.id)} style={{ color: 'red' }}>
+                                <button className="btn-danger" onClick={() => onRemoveTask(task.id)}>
                                     Eliminar
                                 </button>
                             </div>
                         </>
                     )}
-                </div>
+                </li>
             ))}
-        </div>
+        </ul>
     );
 };
