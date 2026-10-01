@@ -27,32 +27,40 @@ export const Tasks: React.FC = () => {
     };
 
     return (
-        <div style={{ maxWidth: "600px", margin: "40px auto", padding: "20px" }}>
+        <div className="container">
             <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h2>Gestión de Tareas</h2>
-                <button onClick={() => logoutUser()}>Cerrar Sesión</button>
+                <h2 style={{ margin: 0 }}>Gestión de Tareas</h2>
+                <button className="btn-danger" onClick={() => logoutUser()}>
+                    Cerrar Sesión
+                </button>
             </header>
 
-            <p>Bienvenido/a, <strong>{user?.email}</strong></p>
+            <p className="welcome-text">
+                Bienvenido/a, <strong>{user?.email}</strong>
+            </p>
 
             <button
+                className="btn-secondary"
                 onClick={handleSendEmail}
                 disabled={emailSending || tasks.length === 0}
-                style={{ marginBottom: "20px", padding: "10px", width: "100%", backgroundColor: "#4CAF50", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}
+                style={{ marginBottom: "20px", width: "100%" }}
             >
                 {emailSending ? "Enviando email..." : "Enviar resumen por email"}
             </button>
 
-            {emailStatus && <p style={{ color: emailStatus.includes("Error") ? "red" : "green" }}>{emailStatus}</p>}
+            {emailStatus && (
+                <p style={{ color: emailStatus.includes("Error") ? "#e74c3c" : "#2ecc71", marginBottom: "15px" }}>
+                    {emailStatus}
+                </p>
+            )}
 
             <TodoForm onAddTask={addTask} />
 
             {loading ? (
-                <p>Cargando tareas...</p>
+                <p className="welcome-text">Cargando tareas...</p>
             ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
+                <p style={{ color: "#e74c3c" }}>{error}</p>
             ) : (
-
                 <TodoList
                     tasks={tasks}
                     onToggleTask={toggleTask}

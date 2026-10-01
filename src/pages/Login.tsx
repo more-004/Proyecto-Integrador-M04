@@ -29,41 +29,39 @@ export const Login: React.FC = () => {
     };
 
     return (
-        <div style={{ maxWidth: "400px", margin: "40px auto", padding: "20px" }}>
+        <div className="container">
             <h2>Iniciar Sesión</h2>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{ color: "red", marginBottom: "15px" }}>{error}</p>}
 
             <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: "10px" }}>
+                <div className="form-group">
                     <label>Email:</label>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        style={{ width: "100%", padding: "8px" }}
                     />
                 </div>
-                <div style={{ marginBottom: "10px" }}>
+                <div className="form-group">
                     <label>Contraseña:</label>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        style={{ width: "100%", padding: "8px" }}
                     />
                 </div>
-                <button type="submit" style={{ width: "100%", padding: "10px", marginBottom: "10px" }}>
+                <button type="submit" className="btn-primary" style={{ width: "100%", marginBottom: "10px" }}>
                     Ingresar
                 </button>
             </form>
 
-            <button onClick={handleGoogleLogin} style={{ width: "100%", padding: "10px" }}>
+            <button onClick={handleGoogleLogin} className="btn-secondary" style={{ width: "100%" }}>
                 Ingresar con Google
             </button>
 
-            <p style={{ marginTop: "15px" }}>
+            <p className="welcome-text" style={{ marginTop: "15px" }}>
                 ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
             </p>
         </div>
