@@ -1,99 +1,105 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { describe, it, expect, vi } from 'vitest';
+import { TodoList } from '../components/TodoList';
 import { Task } from '../types';
 
-interface TodoListProps {
-    tasks: Task[];
-    onToggleTask: (id: string, completed: boolean) => void;
-    onRemoveTask: (id: string) => void;
-    onUpdateTask?: (id: string, updatedTask: Partial<Task>) => void;
-}
+describe('TodoList component', () => {
+    const mockTasks: Task[] = [
+        {
+            id: '1',
+            title: 'Tarea 1',
+            description: 'Descripción 1',
+            completed: false,
+            userId: 'user-1',
+            createdAt: new Date(),
+        },
+        {
+            id: '2',
+            title: 'Tarea 2',
+            description: '',
+            completed: true,
+            userId: 'user-1',
+            createdAt: new Date(),
+        },
+    ];
 
-export const TodoList: React.FC<TodoListProps> = ({
-    tasks,
-    onToggleTask,
-    onRemoveTask,
-    onUpdateTask,
-}) => {
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [editTitle, setEditTitle] = useState('');
-    const [editDescription, setEditDescription] = useState('');
+    it('renders empty message when no tasks are present', () => {
+        render(
+            <TodoList
+                tasks={[]}
+                onToggleTask={vi.fn()}
+                onRemoveTask={vi.fn()}
+            />
+        );
+        expect(screen.getByText('No hay tareas registradas.')).toBeInTheDocument();
+    });
 
-    const handleStartEdit = (task: Task) => {
-        setEditingId(task.id);
-        setEditTitle(task.title);
-        setEditDescription(task.description || '');
-    };
+    it('renders task list items properly', () => {
+        render(
+            <TodoList
+                tasks={mockTasks}
+                onToggleTask={vi.fn()}
+                onRemoveTask={vi.fn()}
+            />
+        );
+        expect(screen.getByText('Tarea 1')).toBeInTheDocument();
+        expect(screen.getByText('Descripción 1')).toBeInTheDocument();
+        expect(screen.getByText('Tarea 2')).toBeInTheDocument();
+        expect(screen.getByText('Completar')).toBeInTheDocument();
+        expect(screen.getByText('Desmarcar')).toBeInTheDocument();
+    });
 
-    const handleCancelEdit = () => {
-        setEditingId(null);
-        setEditTitle('');
-        setEditDescription('');
-    };
+    it('calls onToggleTask when toggle button is clicked', () => {
+        const handleToggle = vi.fn();
+        render(
+            <TodoList
+                tasks={mockTasks}
+                onToggleTask={handleToggle}
+                onRemoveTask={vi.fn()}
+            />
+        );
+        fireEvent.click(screen.getByText('Completar'));
+        expect(handleToggle).toHaveBeenCalledWith('1', false);
+    });
 
-    const handleSaveEdit = async (id: string) => {
-        if (!editTitle.trim()) return;
-        if (onUpdateTask) {
-            await onUpdateTask(id, {
-                title: editTitle.trim(),
-                description: editDescription.trim(),
-            });
-        }
-        setEditingId(null);
-    };
+    it('calls onRemoveTask when remove button is clicked', () => {
+        const handleRemove = vi.fn();
+        render(
+            <TodoList
+                tasks={mockTasks}
+                onToggleTask={vi.fn()}
+                onRemoveTask={handleRemove}
+            />
+        );
+        const removeButtons = screen.getAllByText('Eliminar');
+        fireEvent.click(removeButtons[0]);
+        expect(handleRemove).toHaveBeenCalledWith('1');
+    });
 
-    if (tasks.length === 0) {
-        return <p className="welcome-text">No hay tareas registradas.</p>;
-    }
+    it('enters edit mode and calls onUpdateTask on save', async () => {
+        const handleUpdate = vi.fn();
+        render(
+            <TodoList
+                tasks={mockTasks}
+                onToggleTask={vi.fn()}
+                onRemoveTask={vi.fn()}
+                onUpdateTask={handleUpdate}
+            />
+        );
+        const editButtons = screen.getAllByText('Editar');
+        fireEvent.click(editButtons[0]);
 
-    return (
-        <ul className="task-list">
-            {tasks.map((task) => (
-                <li key={task.id} className="task-item">
-                    {editingId === task.id ? (
-                        <div style={{ width: '100%' }}>
-                            <input
-                                type="text"
-                                value={editTitle}
-                                onChange={(e) => setEditTitle(e.target.value)}
-                                placeholder="Título de la tarea"
-                            />
-                            <textarea
-                                value={editDescription}
-                                onChange={(e) => setEditDescription(e.target.value)}
-                                placeholder="Descripción (opcional)"
-                            />
-                            <div className="task-actions">
-                                <button className="btn-primary" onClick={() => handleSaveEdit(task.id)}>
-                                    Guardar
-                                </button>
-                                <button className="btn-secondary" onClick={handleCancelEdit}>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <div className="task-info">
-                                <h3 style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
-                                    {task.title}
-                                </h3>
-                                {task.description && <p>{task.description}</p>}
-                            </div>
-                            <div className="task-actions">
-                                <button className="btn-secondary" onClick={() => handleStartEdit(task)}>
-                                    Editar
-                                </button>
-                                <button className="btn-secondary" onClick={() => onToggleTask(task.id, task.completed)}>
-                                    {task.completed ? 'Desmarcar' : 'Completar'}
-                                </button>
-                                <button className="btn-danger" onClick={() => onRemoveTask(task.id)}>
-                                    Eliminar
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </li>
-            ))}
-        </ul>
-    );
-};
+        const titleInput = screen.getByPlaceholderText('Título de la tarea');
+        fireEvent.change(titleInput, { target: { value: 'Tarea 1 Modificada' } });
+
+        const saveButton = screen.getByText('Guardar');
+        fireEvent.click(saveButton);
+
+        expect(handleUpdate).toHaveBeenCalledWith('1', {
+            title: 'Tarea 1 Modificada',
+            description: 'Descripción 1',
+        });
+    });
+});

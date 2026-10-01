@@ -10,6 +10,7 @@ export const sendTaskSummaryEmail = async (email: string, tasks: Task[]): Promis
     });
 
     if (!response.ok) {
-        throw new Error("Falló el envío del correo electrónico");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.details || "Falló el envío del correo electrónico");
     }
 };

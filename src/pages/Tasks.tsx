@@ -19,8 +19,8 @@ export const Tasks: React.FC = () => {
         try {
             await sendTaskSummaryEmail(user.email, tasks);
             setEmailStatus("¡Resumen enviado con éxito a tu email!");
-        } catch (err) {
-            setEmailStatus("Error al enviar el resumen por email.");
+        } catch (err: any) {
+            setEmailStatus(err.message || "Error al enviar el resumen por email.");
         } finally {
             setEmailSending(false);
         }
